@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  submited Boolean   @default(false)
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  username String    @unique @default(uuid())
+  password String
+  avatar   String? // URL or path to user's avatar image
+  projects Project[]
+  comments Comment[]
+  tasks    Task[] // Use `tasks` instead of `Task`
+}
+
+model Project {
+  id         Int        @id @default(autoincrement())
+  title      String
+  ownerId    Int
+  owner      User       @relation(fields: [ownerId], references: [id])
+  categories Category[]
+  tasks      Task[]
+}
+
+model Category {
+  id        Int     @id @default(autoincrement())
+  name      String
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  assigneeId  Int?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id])
+  comments    Comment[]
+  status      String
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
