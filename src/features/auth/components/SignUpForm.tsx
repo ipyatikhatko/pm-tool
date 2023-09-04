@@ -1,5 +1,6 @@
 "use client";
 
+import { SignUpResponseBody } from "@/app/api/auth/signup/route";
 import { Button } from "@/components/ui/button";
 import {
   FormField,
@@ -10,8 +11,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import axios, { AxiosError } from "axios";
+import { NextResponse } from "next/server";
+import { FormProvider, useForm } from "react-hook-form";
 import * as z from "zod";
 
 const passwordRequirements = z
@@ -34,7 +38,7 @@ const formSchema = z.object({
 });
 
 export function SignUpForm() {
-  // 1. Define your form.
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,11 +48,27 @@ export function SignUpForm() {
     },
   });
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    axios
+      .post<SignUpResponseBody>("/api/auth/signup", values)
+      .then(({ data }) => {
+        toast({
+          title: "Success!",
+          description: data.message,
+          className: "bg-green-100 border-green-300 text-green-500",
+        });
+      })
+      .catch((err: AxiosError<SignUpResponseBody>) => {
+        form.setError("email", { message: "" });
+        form.setError("username", { message: "" });
+        form.setError("password", { message: "" });
+
+        toast({
+          title: "Error",
+          description: err.response?.data.message,
+          className: "bg-red-100 border-red-300 text-red-500",
+        });
+      });
   }
 
   return (

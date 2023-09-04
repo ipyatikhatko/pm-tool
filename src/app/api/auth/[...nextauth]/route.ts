@@ -1,21 +1,22 @@
 // pages/api/auth/[...nextauth].js
 
-import NextAuth, { NextAuthOptions, RequestInternal } from 'next-auth'
+import NextAuth, { AuthOptions, RequestInternal, User } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Adapter } from 'next-auth/adapters'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { compare } from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/db'
 
-const prisma = new PrismaClient()
-
-const options: NextAuthOptions = {
+export const authOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
+  session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'email', type: 'text' },
+        username: { label: "username", type: "text" },
+        password: { label: "password", type: "password" },
       },
       async authorize(
         credentials: Record<"username" | "password", string> | undefined,
@@ -37,7 +38,7 @@ const options: NextAuthOptions = {
         // Check if the user exists and if the password matches
         if (user && (await compare(password, user.password))) {
           return {
-            id: user.id.toString(),
+            id: user.id,
             username: user.username,
             email: user.email,
           };
@@ -47,28 +48,22 @@ const options: NextAuthOptions = {
       },
     }),
   ],
-  adapter: PrismaAdapter(prisma) as Adapter,
-  secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
-  jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
-    maxAge: 60 * 60 * 24 * 30,
-  },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = { ...user }
+      }
+      return token;
+    },
     async session({ session, user, token }) {
-      if (user !== null) {
-
-        session.user = user;
+      if (token.user) {
+        session.user = token.user as User;
       }
       return session;
-    },
-
-    async jwt({ token, user }) {
-      return token;
     },
   },
 }
 
-const handler = NextAuth(options)
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

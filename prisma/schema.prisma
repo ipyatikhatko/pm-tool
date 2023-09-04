@@ -11,34 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  submited Boolean   @default(false)
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  username String    @unique @default(uuid())
-  password String
-  avatar   String? // URL or path to user's avatar image
-  projects Project[]
-  comments Comment[]
-  tasks    Task[] // Use `tasks` instead of `Task`
-}
-
-model Project {
-  id         Int        @id @default(autoincrement())
-  title      String
-  ownerId    Int
-  owner      User       @relation(fields: [ownerId], references: [id])
-  categories Category[]
-  tasks      Task[]
-}
-
-model Category {
-  id        Int     @id @default(autoincrement())
-  name      String
-  projectId Int
-  project   Project @relation(fields: [projectId], references: [id])
-}
-
 model Task {
   id          Int       @id @default(autoincrement())
   title       String
@@ -50,7 +22,50 @@ model Task {
   projectId   Int
   project     Project   @relation(fields: [projectId], references: [id])
   comments    Comment[]
-  status      String
+  statusId    Int
+  status      Status    @relation("TaskToStatus", fields: [statusId], references: [id])
+  labels      Label[]   @relation("TaskToLabel")
+}
+
+model Status {
+  id        Int     @id @default(autoincrement())
+  name      String
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id])
+  tasks     Task[]  @relation("TaskToStatus")
+}
+
+model Label {
+  id        Int     @id @default(autoincrement())
+  name      String
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id])
+  tasks     Task[]  @relation("TaskToLabel")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  ownerId     Int
+  owner       User     @relation(fields: [ownerId], references: [id])
+  statuses    Status[]
+  labels      Label[]
+  tasks       Task[]
+}
+
+model User {
+  submited  Boolean   @default(false)
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  username  String    @unique @default(uuid())
+  password  String
+  avatar    String?
+  projects  Project[]
+  comments  Comment[]
+  tasks     Task[]
+  user      User      @relation("UserFollowers", fields: [id], references: [id])
+  followers User[]    @relation("UserFollowers")
 }
 
 model Comment {
