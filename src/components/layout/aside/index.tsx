@@ -11,10 +11,10 @@ const LayoutAside = () => {
   const pathname = usePathname();
   return (
     <aside className="row-span-2 lg:rounded-lg lg:px-4 h-full lg:bg-gray-100 overflow-hidden divide-y divide-slate-300">
-      <div className="grid place-content-center h-[80px] ">
+      <div className="hidden sm:grid place-content-center h-[80px] ">
         <span className="text-slate-600 text-2xl font-bold">PMTool</span>
       </div>
-      <div className="pt-4 mb-4 flex lg:flex-col gap-5 overflow-scroll lg:overflow-auto">
+      <div className="py-4 sm:pt-4 sm:mb-4 flex lg:flex-col gap-5 overflow-scroll lg:overflow-auto">
         {links.map((path) => {
           const isActive = pathname.includes(path);
           return (

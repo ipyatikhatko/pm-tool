@@ -41,6 +41,7 @@ export const authOptions: AuthOptions = {
             id: user.id,
             username: user.username,
             email: user.email,
+            image: user.avatar
           };
         } else {
           return null; // Invalid credentials

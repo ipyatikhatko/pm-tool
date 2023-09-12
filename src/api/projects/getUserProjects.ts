@@ -7,7 +7,11 @@ export type GetUserProjectsResult = (Prisma.ProjectGetPayload<{
     id: true,
     title: true,
     description: true,
-    owner: true,
+    owner: {
+      select: {
+        username: true
+      }
+    },
     createdAt: true,
     updatedAt: true
   }
@@ -28,7 +32,11 @@ export const getUserProjects = async (): Promise<GetUserProjectsResult> => {
       id: true,
       title: true,
       description: true,
-      owner: true,
+      owner: {
+        select: {
+          username: true
+        }
+      },
       createdAt: true,
       updatedAt: true
     }

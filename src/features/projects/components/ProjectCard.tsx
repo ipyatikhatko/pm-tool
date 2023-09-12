@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
-import Image from "next/image";
-import { Prisma, Project } from "@prisma/client";
-import { CalendarPlus, Clock, MoreVertical, User } from "lucide-react";
+import { CalendarPlus, MoreVertical, PenLine } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "@/components/ui/button";
@@ -23,7 +21,6 @@ type Props = {
 };
 
 const ProjectCard = ({ data: project }: Props) => {
-  console.log(project);
   return (
     <TooltipProvider delayDuration={150}>
       <div className="p-4 bg-white shadow-sm rounded-lg text-slate-600 cursor-pointer hover:outline hover:outline-2">
@@ -48,7 +45,7 @@ const ProjectCard = ({ data: project }: Props) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex gap-4 items-center cursor-pointer">
-                  <Clock size={18} />
+                  <PenLine size={18} />
                   <span>{dayjs().to(project.updatedAt)}</span>
                 </div>
               </TooltipTrigger>

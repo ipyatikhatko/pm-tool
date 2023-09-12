@@ -43,31 +43,50 @@ model Label {
   tasks     Task[]  @relation("TaskToLabel")
 }
 
+enum ProjectRole {
+  CO_OWNER
+  GUEST
+  MEMBER
+}
+
+model ProjectMembership {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  projectId Int
+  role      ProjectRole
+  project   Project     @relation(fields: [projectId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+}
+
 model Project {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  ownerId     Int
-  owner       User     @relation(fields: [ownerId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  statuses    Status[]
-  labels      Label[]
-  tasks       Task[]
+  id                Int                 @id @default(autoincrement())
+  title             String
+  description       String?
+  ownerId           Int
+  owner             User                @relation(name: "OwnedProjects", fields: [ownerId], references: [id])
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now()) @updatedAt
+  statuses          Status[]
+  labels            Label[]
+  tasks             Task[]
+  members           User[]              @relation(name: "ProjectMemberships")
+  projectMembership ProjectMembership[]
 }
 
 model User {
-  submited  Boolean   @default(false)
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  username  String    @unique @default(uuid())
-  password  String
-  avatar    String?
-  projects  Project[]
-  comments  Comment[]
-  tasks     Task[]
-  user      User      @relation("UserFollowers", fields: [id], references: [id])
-  followers User[]    @relation("UserFollowers")
+  submited          Boolean             @default(false)
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique
+  username          String              @unique @default(uuid())
+  password          String
+  avatar            String?
+  projects          Project[]           @relation(name: "ProjectMemberships") // Rename the relation to match the "members" field in Project
+  comments          Comment[]
+  tasks             Task[]
+  user              User                @relation("UserFollowers", fields: [id], references: [id])
+  followers         User[]              @relation("UserFollowers")
+  ownedProjects     Project[]           @relation(name: "OwnedProjects") // Specify the opposite relation field
+  projectMembership ProjectMembership[]
 }
 
 model Comment {
