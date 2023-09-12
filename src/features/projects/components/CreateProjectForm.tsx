@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Prisma, Project } from "@prisma/client";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -24,8 +25,11 @@ const formSchema = z.object({
   statuses: z.object({ name: z.string() }).array().optional(),
 });
 
-export function CreateProjectForm() {
-  const session = useSession();
+type Props = {
+  onCreated: (project: Project) => void;
+};
+
+export function CreateProjectForm({ onCreated }: Props) {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,12 +40,10 @@ export function CreateProjectForm() {
     },
   });
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control: form.control, // control props comes from useForm (optional: if you are using FormContext)
-      name: "statuses",
-    }
-  );
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "statuses",
+  });
 
   const handleStatusBlur = (
     e: React.FocusEvent<HTMLInputElement>,
@@ -60,11 +62,11 @@ export function CreateProjectForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     axios
-      .post("/api/secured/projects", {
+      .post<Project>("/api/secured/projects", {
         ...values,
       })
       .then((res) => {
-        console.log(res.data);
+        onCreated(res.data);
       });
   }
 

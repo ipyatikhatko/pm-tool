@@ -49,6 +49,8 @@ model Project {
   description String?
   ownerId     Int
   owner       User     @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
   statuses    Status[]
   labels      Label[]
   tasks       Task[]

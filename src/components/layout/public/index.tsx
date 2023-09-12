@@ -1,5 +1,5 @@
 import React from "react";
-import RocketSvg from "@/components/svg/RocketSvg";
+import Rocket from "@/components/svg/Rocket";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignInForm } from "@/features/auth/components/SignInForm";
 import { SignUpForm } from "@/features/auth/components/SignUpForm";
@@ -10,7 +10,7 @@ const HomePublic = (props: Props) => {
   return (
     <>
       <span className="fixed bottom-1/3 md:bottom-0 -right-[200px] md:-right-[350px] xl:-right-[540px]">
-        <RocketSvg className="w-[400px] h-[400px] md:w-[700px] md:h-[700px] xl:w-[1200px] xl:h-[1080px]" />
+        <Rocket className="w-[400px] h-[400px] md:w-[700px] md:h-[700px] xl:w-[1200px] xl:h-[1080px]" />
       </span>
       <div className="max-w-screen-xl mx-auto min-h-screen relative flex flex-col lg:flex-row justify-around items-center">
         <div className=" h-full flex flex-col justify-center px-8 drop-shadow-xl">

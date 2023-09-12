@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import "@/app/globals.css";
-import HomePublic from "@/components/HomePublic";
+import HomePublic from "@/components/layout/public";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import clsx from "clsx";
